@@ -10,6 +10,8 @@ mod runtime;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    init_tracing();
+
     let cli = Cli::parse_args();
     let total_jobs = cli.jobs.get();
     let fail_count = fail_count(total_jobs, cli.fail_rate);
@@ -58,4 +60,13 @@ impl Job for CliJob {
 
 fn fail_count(total_jobs: usize, fail_rate: f64) -> usize {
     ((total_jobs as f64) * fail_rate).round() as usize
+}
+
+fn init_tracing() {
+    tracing_subscriber::fmt()
+        .with_env_filter(
+            tracing_subscriber::EnvFilter::try_from_default_env()
+                .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("info")),
+        )
+        .init();
 }
