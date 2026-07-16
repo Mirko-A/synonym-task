@@ -13,10 +13,10 @@ async fn main() -> anyhow::Result<()> {
 
     match Runtime::start(inputs, || CliJob).await {
         Ok(completed) => {
-            println!("completed {} jobs", completed.len());
+            tracing::info!("completed {} jobs", completed.len());
         }
         Err(error) => {
-            eprintln!("runtime error: {error}");
+            tracing::error!(%error, "runtime error");
             return Err(anyhow::anyhow!("runtime error: {error}"));
         }
     }
@@ -32,7 +32,7 @@ impl Job for CliJob {
     type Error = String;
 
     async fn run(&self, input: Self::Input) -> Result<Self::Output, Self::Error> {
-        println!("job {input} completed");
+        tracing::info!("job {input} completed");
         Ok(())
     }
 }
